@@ -1,0 +1,70 @@
+--1
+    create table Emp_Rate (workers_id number, workers_salary number, Rate varchar2(10));
+    insert into Emp_Rate(workers_id, workers_salary) 
+    SELECT e.employee_id, e.salary FROM employees e, departments d where e.department_id = d.department_id and d.department_name = 'IT';
+
+--2
+--Также внутри анонимного блока создайте цикл, который для каждого работника проставит рейтинг в соответствующей колонке.
+-- Рейтинг присваивается по одной звездочке (*) за каждую 1000 зарплаты.
+
+Update Emp_rate
+Set Rate = '*';
+
+declare
+counter number := 1;
+max_steps number;
+begin
+select max(WORKERS_SALARY / 1000) into max_steps from EMP_RATE; 
+loop
+    update Emp_Rate
+    Set Rate = lpad(Rate,counter,'*')
+    where trunc(WORKERS_SALARY / 1000) = counter;
+    counter := counter + 1;
+    exit when counter = max_steps + 1; 
+end loop;
+end;
+
+--3 
+begin
+    for i in (select * from Emp_rate) loop
+        DBMS_OUTPUT.PUT_LINE(i.WORKERS_ID||' '||i.WORKERS_SALARY||' '||i.RATE);
+    end loop;
+end;
+
+--4
+Drop table Emp_rate;
+
+--5
+begin
+    for i in (select region_name from regions where region_id in
+        (select region_id from countries where country_id in
+        (select country_id from locations where location_id in 
+        (select location_id from departments)))) loop
+             for j in (select * from locations where location_id in
+            (select location_id from departments) and location_id in
+            (select location_id from countries where country_id in
+            (select country_id from regions))) loop
+                -- DBMS_OUTPUT.PUT_LINE(i.region_name);
+                if i.region_name like 'Europe' then
+                    DBMS_OUTPUT.PUT_LINE(j.POSTAL_CODE||' '||j.CITY||' '||j.STREET_ADDRESS);
+                end if;
+                if i.region_name like 'Americas' then
+                   DBMS_OUTPUT.PUT_LINE(j.CITY||' '||j.STATE_PROVINCE||' '||j.COUNTRY_ID);
+                end if;
+                if i.region_name <> 'Americas' and i.region_name <> 'Europe' then
+                    DBMS_OUTPUT.PUT_LINE(j.POSTAL_CODE||' '||j.CITY||' далеко - далеко ');
+                 end if;
+            end loop;
+        end loop;
+end;
+
+
+--6 В новом анонимном блоке выведите на печать фамилии всех работников, у которых фамилия содержит букву «n» и комиссионные больше 20%. 
+begin
+    DBMS_OUTPUT.PUT_LINE('Фамилии работников: ');
+    for i in (select * from employees) loop
+        if i.last_name like '%n%' and i.COMMISSION_PCT > 0.2 then
+            DBMS_OUTPUT.PUT_LINE(i.last_name);
+        end if;
+    end loop;
+end;

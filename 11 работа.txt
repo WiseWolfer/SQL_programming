@@ -1,0 +1,57 @@
+ CREATE TABLE sales_reps
+(id number, name varchar2(50), 
+salary number, commission_pct number);
+
+CREATE TABLE copy_emp 
+as SELECT * FROM employees
+ WHERE mod(employee_id,10)=0;
+
+CREATE TABLE copy_dep
+as SELECT * FROM departments 
+ WHERE department_id not in (70,100,30);
+
+ --создали таблицу my_employee
+ --1
+ CREATE TABLE my_employee
+(id NUMBER(4) CONSTRAINT my_employee_id_nn NOT NULL,
+last_name VARCHAR2(25),
+first_name VARCHAR2(25),
+userid VARCHAR2(8),
+salary NUMBER(9,2));
+--2
+Insert into my_employee
+Values(1, 'Galustyan', 'Artem', 'GG', 30000)
+
+--3
+INSERT INTO my_employee
+VALUES (2, 'Galushkina', 'Yullya', 'GW', 10000);
+
+--4
+select *
+from my_employee;
+
+--5
+Commit; 
+
+--6
+INSERT INTO my_employee
+VALUES (3, 'Buhamedovich', 'Tagir', 'GW', 90000);
+Update my_employee
+Set last_name= 'Drexler', userid = 'GP'
+where id =3;
+
+--7
+Update my_employee
+Set salary = 1000
+where salary < 900
+and id =3;
+
+--9
+INSERT INTO my_employee
+VALUES (4, 'Dancs', 'Betty', 'GL', 100000);
+Delete from my_employee
+where first_name = 'Betty'
+and last_name = 'Dancs';
+
+--11
+commit;

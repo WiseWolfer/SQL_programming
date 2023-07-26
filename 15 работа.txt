@@ -1,0 +1,29 @@
+--1
+CREATE OR REPLACE FUNCTION get_jobId_and_salarySum(JObID varchar, ssalary number) 
+return number
+is
+enum number;
+Minimum_VAL number;
+Maximun_VAL number;
+BEGIN
+ SELECT MIN_SALARY, MAX_SALARY INTO Minimum_VAL, Maximun_VAL
+ FROM JOBS 
+WHERE JObID = JOB_ID;
+ IF ssalary between Minimum_VAL and Maximun_VAL THEN enum:= 1;
+ ELse
+ enum:= 0;
+ END IF;
+Return enum;
+END get_jobId_and_salarySum;
+
+Select get_jobId_and_salarySum(job_id,salary) From Employees;
+
+--2
+CREATE OR REPLACE TRIGGER Trigger_for_get_jobId_and_salarySum
+BEFORE insert or update on employees
+FOR EACH ROW
+BEGIN
+ IF get_jobId_and_salarySum(:new.job_id, :new.salary) = 0
+  then raise VALUE_ERROR;
+ END IF;
+END;

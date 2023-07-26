@@ -1,0 +1,303 @@
+CREATE TABLE am_works_per_building_gpm (
+    building_id        DOUBLE PRECISION NOT NULL,
+    work_name          VARCHAR(30) NOT NULL,
+    building_name      VARCHAR(40) NOT NULL,
+    volume_of_works    DOUBLE PRECISION,
+    unit               VARCHAR(10),
+    "Name_of_GPM (FK)" VARCHAR(30) NOT NULL
+);
+
+ALTER TABLE am_works_per_building_gpm ADD CONSTRAINT amount_of_works_pk PRIMARY KEY ( building_id );
+
+
+CREATE TABLE calendar_plan_el_works (
+    st_end_date_el_works      VARCHAR(40) NOT NULL,
+    pr_calendar               SMALLINT NOT NULL,
+    building_name             VARCHAR(30) NOT NULL,
+    brigade_id                SMALLINT NOT NULL,
+    st_date_electr_iworks     TIMESTAMP(0),
+    end_date_electr_iworks    TIMESTAMP(0),
+    duration_of_works_in_days SMALLINT,
+    cost_of_smr               INTEGER,
+    labor_per_obj             INTEGER
+);
+
+ALTER TABLE calendar_plan_el_works ADD CONSTRAINT calendar_plan_el_works_pk PRIMARY KEY ( st_end_date_el_works );
+
+
+CREATE TABLE cert_of_compl_works_for_month (
+    work_name_cert           VARCHAR(30) NOT NULL,
+    ac_am_work_perf          SMALLINT,
+    building_name            VARCHAR(30) NOT NULL,
+    unit                     VARCHAR(10),
+    date_of_compilation      TIMESTAMP(0),
+    l_costs_workers_per_unit DOUBLE PRECISION,
+    l_costs_workers_total    DOUBLE PRECISION
+);
+
+ALTER TABLE cert_of_compl_works_for_month ADD CONSTRAINT cert_compl_works_month_pk PRIMARY KEY ( work_name_cert );
+
+
+CREATE TABLE dir_prof_workers_brig (
+    brigade_id        SMALLINT NOT NULL,
+    amount_of_workers SMALLINT,
+    position          VARCHAR(30)
+);
+
+ALTER TABLE dir_prof_workers_brig ADD CONSTRAINT directory_prof_workers_brig_pk PRIMARY KEY ( brigade_id );
+
+
+CREATE TABLE directory_nomenclature_gpm (
+    name_of_gpm        VARCHAR(60) NOT NULL,
+    max_load_capacity  SMALLINT,
+    max_height_of_hook SMALLINT,
+    max_crane_arm_dep  SMALLINT
+);
+
+ALTER TABLE directory_nomenclature_gpm ADD CONSTRAINT directory_nom_of_gpm_pk PRIMARY KEY ( name_of_gpm );
+
+
+CREATE TABLE directory_of_works (
+    work_name VARCHAR(40) NOT NULL,
+    gesn_id   VARCHAR(60) NOT NULL,
+    unit      VARCHAR(5)
+);
+
+ALTER TABLE directory_of_works ADD CONSTRAINT directory_works_pk PRIMARY KEY ( work_name );
+
+
+CREATE TABLE "Exploition of GPM" (
+    am_gpm        DOUBLE PRECISION NOT NULL,
+    gesn_id       VARCHAR(60) NOT NULL,
+    name_of_gpm   VARCHAR(30) NOT NULL,
+    amount_of_gpm SMALLINT
+);
+
+ALTER TABLE "Exploition of GPM" ADD CONSTRAINT "Exploition of GPM_PK" PRIMARY KEY ( am_gpm );
+
+
+CREATE TABLE list_avai_gpm_in_comp (
+    id_of_gpm_in_comp DOUBLE PRECISION NOT NULL,
+    name_of_gpm       VARCHAR(30) NOT NULL,
+    rent_price_gpm    INT,
+    renter            VARCHAR(30)
+);
+
+ALTER TABLE list_avai_gpm_in_comp ADD CONSTRAINT list_avai_gpm_in_comp_pk PRIMARY KEY ( id_of_gpm_in_comp );
+
+ALTER TABLE list_avai_gpm_in_comp ADD CONSTRAINT list_avai_gpm_in_comp__un UNIQUE ( name_of_gpm );
+
+
+CREATE TABLE list_of_vol_of_works_per_floor (
+    work_id                       DOUBLE PRECISION NOT NULL,
+    work_name                     VARCHAR(30) NOT NULL,
+    scope_of_work_at_the_facility SMALLINT,
+    scope_of_work_per_floor       SMALLINT,
+    duration_of_work              SMALLINT
+);
+
+ALTER TABLE list_of_vol_of_works_per_floor ADD CONSTRAINT list_of_volume_of_works_pk PRIMARY KEY ( work_id );
+
+
+CREATE TABLE production_calendar (
+    pr_calendar          SMALLINT NOT NULL,
+    working_days_in_2022 TIMESTAMP(0),
+    working_days_in_2023 TIMESTAMP(0)
+);
+
+ALTER TABLE production_calendar ADD CONSTRAINT production_calendar_pk PRIMARY KEY ( pr_calendar );
+
+
+CREATE TABLE reg_buildings_in_district (
+    building_name_reg         VARCHAR(50) NOT NULL,
+    number_of_building        SMALLINT NOT NULL,
+    floors                    SMALLINT,
+    entrances                 SMALLINT,
+    "Total_number_of_floors " SMALLINT
+);
+
+ALTER TABLE reg_buildings_in_district ADD CONSTRAINT reg_buildings_in_district_pk PRIMARY KEY ( building_name_reg );
+
+
+CREATE TABLE reg_pres_cond_mach_mech (
+    id_of_gpm_reg     DOUBLE PRECISION NOT NULL,
+    name_of_gpm       VARCHAR(30) NOT NULL,
+    gpm_availability  VARCHAR(10),
+    gpm_condition     VARCHAR(20),
+    number_of_own_gpm SMALLINT
+);
+
+ALTER TABLE reg_pres_cond_mach_mech ADD CONSTRAINT reg_pres_cond_mach_mech_pk PRIMARY KEY ( id_of_gpm_reg );
+
+ALTER TABLE reg_pres_cond_mach_mech ADD CONSTRAINT reg_pres_cond_mach_mech__un UNIQUE ( name_of_gpm );
+
+
+CREATE TABLE report_on_compl_works (
+    work_name_report          VARCHAR(30) NOT NULL,
+    building_name             VARCHAR(30) NOT NULL,
+    unit                      VARCHAR(30),
+    volume_per_object         SMALLINT,
+    act_am_work_performed     SMALLINT,
+    st_date_act_am_work_perf  TIMESTAMP(0),
+    end_date_act_am_work_perf TIMESTAMP(0),
+    remaining_volume          SMALLINT,
+    date_of_remain_vol        TIMESTAMP(0)
+);
+
+ALTER TABLE report_on_compl_works ADD CONSTRAINT report_on_compl_works_pk PRIMARY KEY ( work_name_report );
+
+
+CREATE TABLE staffing_arrangements (
+    worker_id                    DOUBLE PRECISION NOT NULL,
+    position                     VARCHAR(30),
+    sp_category                  DOUBLE PRECISION,
+    "Tariff rate per specialist" SMALLINT,
+    gesn_id                      VARCHAR(60) NOT NULL
+);
+
+ALTER TABLE staffing_arrangements ADD CONSTRAINT staffing_arrangements_pk PRIMARY KEY ( worker_id );
+
+
+CREATE TABLE state_element_estimates (
+    gesn_id    VARCHAR(60) NOT NULL,
+    gesn_unit  VARCHAR(10),
+    gesn_name  VARCHAR(100),
+    labor_cost DOUBLE PRECISION
+);
+
+ALTER TABLE state_element_estimates ADD CONSTRAINT state_element_estimates_pk PRIMARY KEY ( gesn_id );
+
+
+CREATE TABLE users (
+    user_id       DOUBLE PRECISION NOT NULL,
+    user_login    VARCHAR(30),
+    user_password VARCHAR(30),
+    position      VARCHAR(30)
+);
+
+ALTER TABLE users ADD CONSTRAINT users_pk PRIMARY KEY ( user_id );
+
+
+CREATE TABLE сal_sch_constr_works (
+    st_end_date_c_works       VARCHAR(30) NOT NULL,
+    building_name             VARCHAR(30) NOT NULL,
+    pr_calendar               SMALLINT NOT NULL,
+    brigade_id                SMALLINT NOT NULL,
+    work_name                 VARCHAR(30),
+    unit                      VARCHAR(2),
+    "Volume of works"         SMALLINT,
+    cost_of_smr               DOUBLE PRECISION,
+    labour_costs              DOUBLE PRECISION,
+    amount_of_workers         SMALLINT,
+    duration_of_works_in_days SMALLINT,
+    st_date_of_works          TIMESTAMP(0),
+    end_date_of_works         TIMESTAMP(0)
+);
+
+ALTER TABLE сal_sch_constr_works ADD CONSTRAINT сal_sched_gen_constr_works_pk PRIMARY KEY ( st_end_date_c_works );
+
+ALTER TABLE сal_sch_constr_works
+    ADD CONSTRAINT dir_prof_workers_brig_fk FOREIGN KEY ( brigade_id )
+        REFERENCES dir_prof_workers_brig ( brigade_id )
+            ON DELETE CASCADE;
+
+ALTER TABLE calendar_plan_el_works
+    ADD CONSTRAINT dir_prof_workers_brig_fkv2 FOREIGN KEY ( brigade_id )
+        REFERENCES dir_prof_workers_brig ( brigade_id )
+            ON DELETE CASCADE;
+
+ALTER TABLE reg_pres_cond_mach_mech
+    ADD CONSTRAINT directory_nom_gpm_fk FOREIGN KEY ( name_of_gpm )
+        REFERENCES directory_nomenclature_gpm ( name_of_gpm )
+            ON DELETE CASCADE;
+
+ALTER TABLE list_avai_gpm_in_comp
+    ADD CONSTRAINT directory_nom_gpm_fkv1 FOREIGN KEY ( name_of_gpm )
+        REFERENCES directory_nomenclature_gpm ( name_of_gpm )
+            ON DELETE CASCADE;
+
+ALTER TABLE "Exploition of GPM"
+    ADD CONSTRAINT directory_nom_gpm_fkv2 FOREIGN KEY ( name_of_gpm )
+        REFERENCES directory_nomenclature_gpm ( name_of_gpm )
+            ON DELETE CASCADE;
+
+ALTER TABLE am_works_per_building_gpm
+    ADD CONSTRAINT directory_nomenclature_gpm_fk FOREIGN KEY ( "Name_of_GPM (FK)" )
+        REFERENCES directory_nomenclature_gpm ( name_of_gpm )
+            ON DELETE CASCADE;
+
+ALTER TABLE am_works_per_building_gpm
+    ADD CONSTRAINT directory_of_works_fk FOREIGN KEY ( work_name )
+        REFERENCES directory_of_works ( work_name )
+            ON DELETE CASCADE;
+
+ALTER TABLE list_of_vol_of_works_per_floor
+    ADD CONSTRAINT directory_works_fk FOREIGN KEY ( work_name )
+        REFERENCES directory_of_works ( work_name )
+            ON DELETE CASCADE;
+
+ALTER TABLE "Exploition of GPM"
+    ADD CONSTRAINT gesn_id_machines_fk FOREIGN KEY ( gesn_id )
+        REFERENCES state_element_estimates ( gesn_id )
+            ON DELETE CASCADE;
+
+ALTER TABLE directory_of_works
+    ADD CONSTRAINT gesn_id_of_works_fk FOREIGN KEY ( gesn_id )
+        REFERENCES state_element_estimates ( gesn_id )
+            ON DELETE CASCADE;
+
+ALTER TABLE сal_sch_constr_works
+    ADD CONSTRAINT product_calendar_fk FOREIGN KEY ( pr_calendar )
+        REFERENCES production_calendar ( pr_calendar )
+            ON DELETE CASCADE;
+
+ALTER TABLE calendar_plan_el_works
+    ADD CONSTRAINT production_calendar_fk FOREIGN KEY ( pr_calendar )
+        REFERENCES production_calendar ( pr_calendar )
+            ON DELETE CASCADE;
+
+ALTER TABLE am_works_per_building_gpm
+    ADD CONSTRAINT reg_buildings_in_district_fk FOREIGN KEY ( building_name )
+        REFERENCES reg_buildings_in_district ( building_name_reg )
+            ON DELETE CASCADE;
+
+ALTER TABLE сal_sch_constr_works
+    ADD CONSTRAINT reg_buildings_in_district_fkv2 FOREIGN KEY ( building_name )
+        REFERENCES reg_buildings_in_district ( building_name_reg )
+            ON DELETE CASCADE;
+
+ALTER TABLE calendar_plan_el_works
+    ADD CONSTRAINT reg_buildings_in_district_fkv3 FOREIGN KEY ( building_name )
+        REFERENCES reg_buildings_in_district ( building_name_reg )
+            ON DELETE CASCADE;
+
+ALTER TABLE report_on_compl_works
+    ADD CONSTRAINT reg_buildings_in_district_fkv4 FOREIGN KEY ( building_name )
+        REFERENCES reg_buildings_in_district ( building_name_reg )
+            ON DELETE CASCADE;
+
+ALTER TABLE cert_of_compl_works_for_month
+    ADD CONSTRAINT reg_buildings_in_district_fkv5 FOREIGN KEY ( building_name )
+        REFERENCES reg_buildings_in_district ( building_name_reg )
+            ON DELETE CASCADE;
+
+ALTER TABLE staffing_arrangements
+    ADD CONSTRAINT state_element_estimates_fk FOREIGN KEY ( gesn_id )
+        REFERENCES state_element_estimates ( gesn_id )
+            ON DELETE CASCADE;
+
+
+CREATE OR REPLACE VIEW List_of_dem_in_workers ( Brigade_id, St_date_electr_iworks, Duration_of_works_in_days, Position, sp_category, Amount_of_workers ) AS
+Select 
+cal.Brigade_id,
+cal.St_date_electr_iworks,
+cal.Duration_of_works_in_days,
+st.Position,
+st.sp_category,
+d.Amount_of_workers
+from Calendar_plan_el_works cal,
+Dir_prof_workers_brig d,
+Staffing_arrangements st
+where cal.Brigade_id= d.Brigade_id and
+cal.Brigade_id = d.workers_id;
+

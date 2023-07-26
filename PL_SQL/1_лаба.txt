@@ -1,0 +1,89 @@
+--1 Зарплата, имя и фамилия человека под номером 102
+
+DECLARE
+emp_salary Number;
+emp_name varchar2(20);
+emp_surname varchar2(20);
+begin
+    Select salary INTO emp_salary
+    FROM employees Where EMPLOYEE_ID = 102;
+
+    Select first_name INTO emp_name 
+    FROM employees Where EMPLOYEE_ID = 102;
+    
+    Select last_name INTO emp_surname
+    FROM employees Where EMPLOYEE_ID = 102;
+    DBMS_OUTPUT.PUT_LINE('EMP_salary is: '||emp_salary|| ', EMP_name is: '||emp_name|| ', EMP_surname is: '||emp_surname);
+end;
+
+--2 В анонимном блоке считайте в переменные фамилию и зарплату начальника отдела «IT» и выведите их в одно предложение.
+Declare
+emp_last_name Varchar2(20); 
+emp_salary Number;
+begin
+    Select e.salary INTO emp_salary 
+    FROM  employees e,  departments d Where e.employee_id = d.manager_id and d.Department_name = 'IT';
+    
+    Select e.last_name INTO emp_last_name 
+    FROM  employees e,  departments d Where e.employee_id = d.manager_id and d.Department_name = 'IT';   
+    DBMS_OUTPUT.PUT_LINE('EMP_salary and Emp_last_name are: '||emp_salary||' '||emp_last_name);
+end;
+
+--3 Измените предыдущий блок, используя вместо локальной переменной связанную переменную. -?
+Variable depart Varchar2(4)
+Declare 
+emp_salary Number;
+emp_last_name Varchar(20);
+begin
+    select e.salary into emp_salary
+    from employees e, departments d 
+    where  e.employee_id = d.manager_id and d.department_name =:depart;
+
+    select e.last_name into emp_last_name
+    from employees e, departments d 
+    where  e.employee_id = d.manager_id and d.department_name =:depart;
+    DBMS_OUTPUT.PUT_LINE('EMP_salary and Emp_last_name are: '||emp_salary||', '||emp_last_name);
+end;
+
+
+--4 В анонимном блоке с помощью предложения SELECT INTO найдите номер сотрудника отдела «FI_ACCOUNT» с наименьшей зарплатой. Затем повысьте зарплату этого сотрудника на 10%.
+
+Declare
+emp_id Number;
+emp_salary Number; 
+begin
+    Select min(salary) into emp_salary from employees  where job_id = 'FI_ACCOUNT';
+    
+    Select employee_id  INTO emp_id
+    FROM  employees  where salary = emp_salary and job_id = 'FI_ACCOUNT';   
+
+    UPDATE employees 
+    SET salary = emp_salary *  1.1
+    where job_id = 'FI_ACCOUNT' and salary = emp_salary;
+    
+     DBMS_OUTPUT.PUT_LINE('EMP_id is: '||emp_id);
+end;
+  
+
+--5
+В анонимном блоке создайте переменные v_job со значением «IT_PROG», v_start_salary со значением 4400, v_dept.
+С помощью предложения SELECT INTO сохраните в переменную  v_dept номер отдела «IT». Затем добавьте в таблицу Employees три работника, используя созданные переменные.
+
+Declare
+v_job Varchar(10) := 'IT_PROG';
+v_start_salary Number := 4400;
+v_dept Number;
+begin
+	Select department_id into v_dept  from departments
+	where department_name = 'IT';
+	
+	INSERT INTO employees (employee_id, first_name, last_name, email, hire_date, job_id, salary, department_id)
+    	VALUES (207, 'Masha', 'Kholkina', 'MkHol', '08/03/1981', v_job, v_start_salary, v_dept);
+
+	INSERT INTO employees (employee_id, first_name, last_name, email, hire_date, job_id, salary, department_id)
+    	VALUES (208, 'Luna', 'Arbuzova', 'LARBZ', '03/07/1992', v_job, v_start_salary, v_dept);
+
+   	 INSERT INTO employees (employee_id, first_name, last_name, email, hire_date, job_id, salary, department_id)
+    	VALUES (209, 'Vladimir', 'Trofimov', 'VLADTROFIM', '09/11/1986', v_job, v_start_salary, v_dept);	
+end;
+

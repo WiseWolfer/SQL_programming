@@ -1,0 +1,150 @@
+--1.	Создать триггер TRG_CHECK_SAL, который будет проверять зарплату при добавлении и изменении строк в таблице Employees.
+-- Триггер должен срабатывать только при условии изменении значений столбца SALARY.
+-- Если изменение данных не затрагивает этот столбец, то триггер выполняться не должен.
+-- Допустимая зарплата сотрудника должна находиться между максимальной и минимальной зарплатой для его должности.
+-- В случае, если зарплата выходит за эти границы вызовите ошибку с помощью следующей функции.
+--RAISE_APPLICATION_ERROR(-20100,  'Зарплата выходит за пределы допустимого диапазона');
+
+Create or Replace Trigger TRG_CHECK_SAL
+After Insert or Update of salary
+ON employees
+For each row
+declare 
+min_salary number;
+max_salary number;
+begin
+    select MIN_SALARY into  min_salary from jobs where Job_id = :NEW.JOB_ID;
+    select Max_SALARY into  max_salary from jobs where Job_id = :NEW.JOB_ID;
+    if min_salary > :NEW.salary then
+        RAISE_APPLICATION_ERROR(-20100,  'Зарплата выходит за пределы допустимого диапазона');
+    elsif max_salary < :NEW.salary then
+        RAISE_APPLICATION_ERROR(-20100,  'Зарплата выходит за пределы допустимого диапазона');
+    end if;
+end;
+
+-- триггер не взаимодействует
+update employees 
+Set Last_Name = 'King'
+where job_id = 'AD_PRES';
+-- дает ошибку RAISE_APPLICATION_ERROR(-20100,  'Зарплата выходит за пределы допустимого диапазона')
+insert into employees(EMPLOYEE_ID, FIRST_NAME, LAST_NAME, EMAIL, PHONE_NUMBER, HIRE_DATE, JOB_ID, SALARY , COMMISSION_PCT, MANAGER_ID, DEPARTMENT_ID)
+values(220,'Dima','Sbrodov', '79128280842@yandex.ru', '89128280842', '09/21/1989', 'FI_MGR', 8000, Null, 101, 100);
+--дает ошибку RAISE_APPLICATION_ERROR(-20100,  'Зарплата выходит за пределы допустимого диапазона')
+update employees 
+Set salary =  10000
+where job_id = 'AD_PRES';
+
+--2.	Поставьте точку сохранения. 
+--3.	В анонимном блоке напечатайте список сотрудников с их зарплатой и максимальной зарплатой по их должности.
+-- В список должны сходить сотрудники, фамилии которых начинаются с буквы «L». 
+--4.	В том же анонимном блоке повысьте зарплату на 50% всем этим сотрудникам. 
+--5.	В том же анонимном блоке напечатайте снова список сотрудников с их зарплатой.
+-- Выполните откат к точке сохранения. Сравните два списка.
+-- двум сотрудникам нужно изменить зарплату, так как если увеличить ее на 0.5, то триггер из первого задания выведет ошибку, так как вышли за пределы макс. зарплаты 
+update employees
+set salary = 2800
+where last_name = 'Ladwig';
+update employees
+set salary = 7800
+where last_name = 'Livingston';
+
+begin
+    Savepoint done; 
+    for i in (select e.first_name, e.last_name, e.salary, j.max_salary from employees e, jobs j where e.job_id = j.job_id
+     and e.last_name like 'L%') loop
+        DBMS_OUTPUT.PUT_LINE('Имя: '||i.first_name||' Фамилия:'||i.last_name||' Зарплата:'||i.salary||' Максимальная зарплата:'||i.max_salary);
+    end loop; 
+    DBMS_OUTPUT.PUT_LINE('============================================================================================');
+    update employees
+    set salary = salary * 1.5
+    where last_name like 'L%';
+
+    for i in (select e.first_name, e.last_name, e.salary, j.max_salary from employees e, jobs j where e.job_id = j.job_id
+     and e.last_name like 'L%') loop
+        
+        DBMS_OUTPUT.PUT_LINE('Имя: '||i.first_name||' Фамилия:'||i.last_name||' Зарплата:'||i.salary||' Максимальная зарплата:'||i.max_salary);
+    end loop; 
+     ROLLBACK TO done;
+     DBMS_OUTPUT.PUT_LINE('============================================================================================');
+     for i in (select e.first_name, e.last_name, e.salary, j.max_salary from employees e, jobs j where e.job_id = j.job_id
+     and e.last_name like 'L%') loop
+        DBMS_OUTPUT.PUT_LINE('Имя: '||i.first_name||' Фамилия:'||i.last_name||' Зарплата:'||i.salary||' Максимальная зарплата:'||i.max_salary);
+    end loop; 
+end;
+
+--6.	Создайте представление DEPT_LOC_VIEW.
+-- Данное представление должно содержать название департамента, страну и город, в котором он находиться, адрес департамента. Выведите содержимое представления DEPT_LOC_VIEW.
+
+-- создаем новую таблицу, в которую кидаем нужные данные из других таблиц
+create table help_table
+as select d.department_name, co.country_name, l.city, l.street_address from departments d, locations l, countries co where d.location_id = l.location_id
+and l.country_id  = co.country_id;
+
+-- затем из новой таблицы кидаем в представление данные 
+Create or replace View DEPT_LOC_VIEW
+as select department_name, country_name, city, street_address from help_table;
+--вывод содержимого представления
+select * from DEPT_LOC_VIEW;
+
+drop view DEPT_LOC_VIEW;
+--7.	Создайте КОМБИНИРОВАННЫЙ ТРИГГЕР для операции вставки данных в данное представление, в котором вставка данных будет производиться в соответствующие таблицы.
+create table help_table
+as select d.department_id, d.department_name, co.country_name, l.city, l.street_address from departments d, locations l, countries co where d.location_id = l.location_id
+and l.country_id  = co.country_id;
+Create or replace View DEPT_LOC_VIEW
+as select  department_id, department_name, country_name, city, street_address from help_table;
+
+Create or Replace Trigger IV
+FOR INSERT ON DEPT_LOC_VIEW COMPOUND TRIGGER
+max_val number;
+slovo varchar2(30);
+    INSTEAD OF EACH ROW IS 
+    begin
+        slovo := upper(substr(:new.country_name,1,2));
+        select max(department_id)+ 100 into max_val from departments;
+        insert into departments(department_id, department_name)
+        values(max_val,:new.department_name);
+
+        select max(location_id)+ 100 into max_val from locations;
+        insert into locations(location_id, STREET_ADDRESS, CITY, COUNTRY_ID)
+        values(max_val, :new.STREET_ADDRESS, :new.city, slovo); 
+
+        insert into countries(country_id, country_name)
+        values(slovo, :new.country_name);
+        
+        select max(department_id)+ 100 into max_val from departments;
+        insert into help_table
+        values(max_val, :new.department_name, :new.country_name, :new.city, :new.STREET_ADDRESS);
+        
+        -- merge into DEPT_LOC_VIEW d_l_v
+        -- using help_table h_t
+        -- on (d_l_v.department_id = h_t.department_id)
+        -- when matched then 
+        -- Update set
+        -- d_l_v.department_name = h_t.department_name,
+        -- d_l_v.country_name = h_t.country_name,
+        -- d_l_v.city = h_t.city,
+        -- d_l_v.street_ADDRESS = h_t.street_ADDRESS
+        -- when not matched then 
+        -- insert values(h_t.department_id, h_t.department_name, h_t.country_name, h_t.city, h_t.STREET_ADDRESS);
+    
+    end INSTEAD OF EACH ROW;
+end IV;
+
+--8.	Выполните вставку данных в представление DEPT_LOC_VIEW.
+-- Используте следующие данные департамент «Support Service», страна «India», город «Delhi», адрес «Urdu Bazar Road, 14».
+insert into DEPT_LOC_VIEW(DEPARTMENT_NAME, COUNTRY_NAME, CITY, STREET_ADDRESS)
+values('Support Service','India','Delhi','Urdu Bazar Road, 14');
+
+-- удаление данных
+delete from DEPT_LOC_VIEW
+where DEPARTMENT_NAME ='Support Service';
+--9.	Выведите содержимое представления DEPT_LOC_VIEW. Проверьте наличие новых данных.
+select * from DEPT_LOC_VIEW;
+
+--10.	Выведите строку таблицы Departments, с именем департамента «Support Service».
+--      Выведите строку таблицы Countries, с названием страны «India».
+--      Выведите строку таблицы Locations, с городом «Delhi».
+select department_name from departments where department_name = 'Support Service';
+select country_name from countries where country_name = 'India';
+select city from locations where city = 'Delhi';

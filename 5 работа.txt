@@ -1,0 +1,16 @@
+SELECT last_name FROM employees WHERE manager_id IS NULL;
+
+SELECT last_name, NVL (TO_CHAR (commission_pct), 'No Commission') COMM FROM employees;
+
+SELECT job_id, DECODE(SUBSTR(job_id,1,2),'AD', 'A',
+'IT', 'B',
+'MK', 'C',
+ 'D')  FROM employees;
+
+SELECT job_id,CASE WHEN job_id LIKE 'AD%' THEN 'A'  
+WHEN SUBSTR(job_id,1,2) LIKE 'IT' THEN 'B'
+WHEN SUBSTR(job_id,1,2) LIKE 'MK' THEN 'C'
+ ELSE 'D' END "LISTER" FROM employees;
+
+
+

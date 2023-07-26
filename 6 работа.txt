@@ -1,0 +1,16 @@
+SELECT to_char(current_date,'dd.mm.yyyy hh24:mi:ss') "DATE" FROM dual;
+
+SELECT last_name, ROUND(CURRENT_DATE - hire_date) MONTHS_WORKED FROM employees 
+ORDER BY MONTHS_WORKED;
+
+SELECT last_name, hire_date, NEXT_DAY (ADD_MONTHS(hire_date, 6),'Monday') REVIEW 
+FROM employees;
+
+SELECT last_name, hire_date, to_char(hire_date,'Day') "DAY" FROM employees
+ORDER BY mod(to_char(hire_date, 'D') + 5, 7);
+
+ALTER SESSION set NLS_DATE_FORMAT = 'DD-MON-YYYY HH24:MI:SS';
+
+ALTER session SET time_zone = '-07:00';
+
+SELECT CURRENT_DATE, CURRENT_TIMESTAMP, LOCALTIMESTAMP FROM dual;

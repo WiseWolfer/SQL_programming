@@ -1,0 +1,106 @@
+--1
+Select Last_Name, hire_date
+From employees
+Where department_id = (SELECT department_id
+FROM employees
+WHERE last_name = 'Zlotkey')
+And Last_Name != 'Zlotkey';
+
+--2
+Select employee_id, Last_name
+From employees
+Where salary > (SELECT Avg(salary) FROM employees)
+order by salary;
+
+--3
+Select employee_id, Last_name
+from employees
+Where department_id = any(select department_id from employees where last_name like '%u%')
+
+--4
+SELECT e.Last_Name, e.department_id, e.job_id
+From EMPLOYEES e, departments d
+where e.department_id = d.department_id
+and d.location_id = 1700;
+
+--5
+Select Last_Name, salary
+From employees
+where manager_id = (Select employee_id from employees where last_name = 'King'); --В списке два персонажа с фамилией "King" (100, 156)
+
+--6
+Select e.department_id, e.last_name, e.job_id
+From EMPLOYEES e, departments d
+where e.department_id = d.department_id
+and d.department_name = 'Executive';
+
+--7
+Select Last_name, department_id, salary
+From employees
+Where department_id = any 
+(Select department_id from employees where COMMISSION_PCT is not null)
+and salary = any(Select salary from employees where COMMISSION_PCT is not null);
+
+--8
+Select e.Last_name, d.department_name, e.salary
+From employees e, departments d
+Where e.department_id = d.department_id
+And e.salary = any(Select e.salary from employees e, departments d where d.location_id = 1700)
+And e.COMMISSION_PCT = any(Select e.COMMISSION_PCT  from employees e, departments d where d.location_id = 1700);
+
+--9
+Select Last_Name, hire_date, salary
+from EMPLOYEES
+where salary = 
+(Select salary
+from EMPLOYEES
+where last_name = 'Kochhar') 
+and concat(to_char(COMMISSION_PCT), 'a') =
+(Select concat(to_char(COMMISSION_PCT), 'a')
+from EMPLOYEES
+where last_name = 'Kochhar')
+
+--10
+SELECT Last_Name, job_id, salary
+from EMPLOYEES
+where salary > ALL(Select salary
+from EMPLOYEES
+where job_id = 'SA_MAN')
+order by salary desc;
+--11
+Select e.Last_Name, d.department_id, e.salary
+from EMPLOYEES e, departments d, locations l
+WHERE e.department_id =d.department_id
+and d.location_id = l.location_id
+and l.city IN(Select l.city from locations l where l.city like 'T%');
+
+--12
+Select e.last_name, e.department_id, e.salary, round(avg(ep.salary))
+from employees e, employees ep
+where e.department_id =ep.department_id
+and e.salary > (Select avg(salary) from EMPLOYEES where e.department_id = department_id)
+group by e.last_name, e.department_id, e.salary 
+order by avg(ep.salary)
+
+--13 
+Select e.last_name "Employee"
+from EMPLOYEES e
+where not exists (select e1.last_name from employees e1 where e.manager_id = e1.manager_id );
+
+--14
+Select e.last_name
+from EMPLOYEES e
+where e.salary < (Select avg(e2.salary) from employees e2 where e.department_id = e2.department_id);
+
+--15
+Select e.Last_Name
+from EMPLOYEES e
+where exists (Select e2.last_name from EMPLOYEES e2 where e2.hire_date > e.hire_date and e2.salary > e.salary and e2.department_id = e.department_id)
+
+--16
+Select e2.employee_id, e2.last_name, (Select d.department_name from departments d where d.department_id = e2.department_id)
+from EMPLOYEES e2;
+
+
+
+

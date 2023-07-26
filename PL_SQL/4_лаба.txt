@@ -1,0 +1,87 @@
+--1 Создайте функцию F_TAX, рассчитывающую подоходный налог с зарплаты (13%). В качестве параметра должна выступать зарплата сотрудника
+Create or REPLACE Function F_TAX(sal employees.salary%TYPE)
+RETURN NUMBER 
+is
+total_sal number := 0;
+begin
+total_sal := sal * 0.13; 
+return total_sal;
+end F_TAX;
+
+declare 
+result_tax number;
+begin
+for i in (select salary from employees) loop
+    result_tax := F_TAX(i.salary);
+    DBMS_OUTPUT.PUT_LINE('The tax from salary is: '|| result_tax);
+end loop;
+end;
+
+--2 Создайте функцию F_COMMISION, возвращающую размер комиссионных сотрудника.
+-- Если сотрудник не получает комиссионные, то возвращаться должен 0, а не пустое значение.
+Create or Replace Function F_COMMISION(e_id employees.employee_id%type)
+return employees.commission_pct%type
+is 
+begin
+    for i in (select COMMISSION_PCT from employees where employee_id = e_id) loop
+        if i.COMMISSION_PCT is NUll THEN
+            return 0;
+        end if;
+        return i.COMMISSION_PCT;
+    end loop;
+end F_COMMISION;
+
+declare
+r_commission employees.commission_pct%type;
+w_id employees.employee_id%type := 141;
+begin
+     r_commission := F_COMMISION(w_id);
+     DBMS_OUTPUT.PUT_LINE('Commission_pct result: '||r_commission);
+end;
+
+--3.Создайте функцию F_TAKE_COM, которая проверяет получает ли сотрудник комиссионные. Эта функция в качестве параметра должна получат номер сотрудника.
+-- А возвращать должна логическую переменную (BULEAN). В теле функции используйте оператор выбора IF, в условии которого вызовите функцию F_COMMISION.
+-- И в зависимости от условия верните либо TRUE, либо FALSE.
+Create or Replace Function  F_TAKE_COM(ep_id employees.employee_id%type)
+return boolean
+is
+begin
+    if F_COMMISION(ep_id)  <> 0  THEN
+        return true;
+    else
+        return false;
+    end if;
+end F_TAKE_COM;
+
+declare
+r_employee_id boolean;
+w_id employees.employee_id%type := 151;
+begin
+    r_employee_id  :=  F_TAKE_COM(w_id);
+    if  r_employee_id = true then
+        DBMS_OUTPUT.PUT_LINE('Commission_pct exists!');
+    else
+        DBMS_OUTPUT.PUT_LINE('Commission_pct is missing!');
+    end if;
+end;
+
+--4.	В анонимном блоке рассчитайте общую сумму налога всех для работников не получающих комиссионные. 
+-- Используйте функцию  F_TAKE_COM, чтобы проверить получает ли работник комиссионные, и функцию  F_TAX для расчета налога. 
+-- Используте цикл, чтобы проверить всех работников. Общую сумму налога сохраняйте в локальной переменной.
+-- В конце напечатайте ее с поясняющим предложением («Общая сумма налога равна ___»). 
+
+declare
+total_sum_of_tax number := 0;
+ch_id  boolean;
+tax number;
+begin
+    for i in (select employee_id from employees) loop
+        ch_id := F_TAKE_COM(i.employee_id);
+        if ch_id = true then
+            select salary into tax from employees where employee_id = i.employee_id;
+            tax := F_TAX(tax);
+            total_sum_of_tax := total_sum_of_tax + tax;       
+        end if;
+    end loop;
+    DBMS_OUTPUT.PUT_LINE('«Общая сумма налога равна '||total_sum_of_tax||'»');
+end;

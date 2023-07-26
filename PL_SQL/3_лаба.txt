@@ -1,0 +1,81 @@
+--1.	Создайте процедуру с именем ADD_JOB для вставки новой должности в таблицу JOBS.
+--  Параметрами процедуры должны служить идентификатор должности и наименование.
+CREATE OR REPLACE PROCEDURE ADD_JOB
+(w_number jobs.job_id%Type, w_name jobs.job_title%Type)
+As
+Begin
+    Insert into jobs(JOB_ID,JOB_TITLE)
+    values(w_number,w_name);
+end;
+
+
+declare
+j_id Varchar2(30) := 'C_comp';
+j_title Varchar2(30) := 'Programmer';
+
+Begin
+    ADD_JOB(j_id, j_title);
+end;
+-- 2.	Вызовите процедуру  ADD_JOB с параметрами  идентификатор IT_WEB и наименование Web Master.
+-- Просмотрите результаты с помощью запроса к таблице JOBS.
+declare
+j_id jobs.job_id%Type := 'IT_WEB';
+j_title jobs.job_title%Type := 'Web Master';
+
+Begin
+    ADD_JOB(j_id, j_title);
+end;
+
+Select job_id, job_title from jobs;
+
+-- 3. Вызовите процедуру  ADD_JOB с параметрами  идентификатор ST_MAN и наименование Stock Manager.
+-- Что произошло и почему?
+-- мы пытались добавить существующие уникальное значения id и title, поэтому oracle не позволил нам это сделать
+declare
+j_id jobs.job_id%Type := 'ST_MAN';
+j_title jobs.job_title%Type := 'Stock Manager';
+
+Begin
+    ADD_JOB(j_id, j_title);
+end;
+
+Select job_id, job_title from jobs;
+
+--4 Создайте таблицу EMP со следующими столбцами: номер работника EMPNO, фамилия работника ENAME,
+-- название должности JOB, номер менеджера MGR, дата найма HIREDATE, зарплата работника SAL, комиссионные COMM, номер департамента DEPTNO. 
+
+Create Table EMP
+(EMPNO Number(6), ENAME Varchar2(25),
+JOB VARCHAR2(10), MGR NUMBER(6),
+HIREDATE DATE, SAL NUMBER(8,2),
+COMM NUMBER(2,2), DEPTNO NUMBER(4));
+
+
+--5 Создайте процедуру ADD_EMP с параметрами, соответствующими столбцам таблицы EMP (не называйте их также, добавьте префикс «p_», например «p_empno»). 
+-- Укажите для параметров процедуры значения по умолчанию:  название должности SALESMAN, дата найма — сегодняшнее число, зарплата работника 1500,
+-- комиссионные — пустое значение, номер департамента 30. Процедура должна выполнять вставку строки в таблицу  EMP.
+
+Create or Replace procedure ADD_EMP(p_EMPNO emp.EMPNO%TYPE, p_ENAME emp.ENAME%TYPE, p_JOB in Varchar2 DEfault 'SALESMAN', p_MGR in emp.MGR%TYPE,
+ p_HIREDATE in emp.HIREDATE%TYPE Default SYSDATE, p_SAL in Number := 1500, p_COMM in NUMBER := null, p_DEPTNO in Number := 30)
+IS
+begin
+Insert into EMP
+Values(p_EMPNO, p_ENAME, p_JOB, p_MGR, p_HIREDATE, p_SAL, p_COMM, p_DEPTNO);
+end ADD_EMP;
+
+-- проверка работы
+begin
+    ADD_EMP(3, 'Sbrodov', p_MGR => 100);
+end;
+
+--6 Вставьте в таблицу EMP строку. Вызовите процедуру ADD_EMP из анонимного блока, используя комбинированный метод передачи параметров.
+-- Номер работника и фамилию укажите позиционно, а номер менеджера, зарплату и комиссионные по имени параметра.
+
+insert into Emp(EMPNO, ENAME, JOB, MGR, HIREDATE, SAL, COMM, DEPTNO)
+Values(1, 'Domovod', 'IT_PROG', 100, '09/21/1989', 30000, null, 60);
+
+begin
+    ADD_EMP(2, 'Momedov', p_MGR => 200, p_SAL => 20000, p_COMM =>0.2);
+end;
+--7
+select * From emp;

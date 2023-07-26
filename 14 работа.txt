@@ -1,0 +1,58 @@
+--1
+CREATE VIEW EMPLOYEES_VU
+AS SELECT employee_id, last_name "Employee", department_id 
+FROM employees;
+--2
+Select *
+From EMPLOYEES_VU
+--3
+Select view_name, text
+From USER_VIEWS
+--4
+Select "Employee", department_id
+From EMPLOYEES_VU
+--5
+CREATE VIEW DEPT50
+AS SELECT employee_id "EMPNO", last_name "EMPLOYEE", department_id "DEPTNO"
+FROM employees
+WHERE department_id = 50
+WITH CHECK OPTION CONSTRAINT DEPT50;
+--6
+Select *
+From DEPT50
+--7
+UPDATE DEPT50 SET DEPTNO = 80 
+WHERE EMPLOYEE = 'Matos';
+--8
+CREATE VIEW SALARY_VU
+AS SELECT e.LAST_NAME "EMPLOYEE", d.DEPARTMENT_NAME "DEPARTMENT", e.SALARY "SALARY_GRADE" 
+FROM EMPLOYEES e, DEPARTMENTS d
+WHERE e.department_id = d.department_id
+
+Select *
+from salary_Vu
+--9
+CREATE SEQUENCE DEPT_ID_SEQ
+INCREMENT BY 10
+START WITH 200
+MAXVALUE 1000
+
+DROP SEQUENCE DEPT_ID_SEQ
+
+--10
+INSERT INTO DEPT (DEPARTMENT_ID, DEPARTMENT_NAME)
+VALUES (DEPT_ID_SEQ.NEXTVAL, 'Administration')
+
+INSERT INTO DEPT (DEPARTMENT_ID, DEPARTMENT_NAME)
+VALUES (DEPT_ID_SEQ.NEXTVAL, 'Education')
+
+Select *
+From DEPT;
+--11
+CREATE INDEX EMP_INDEX ON EMP(DEPT_ID)
+--12
+SELECT ic.index_name, ic.column_name, ic.column_position col_pos, iu.uniqueness
+FROM user_indexes iu, user_ind_columns ic
+WHERE ic.index_name = iu.index_name
+AND ic.table_name = 'EMPLOYEES'
+ORDER BY 1,3;

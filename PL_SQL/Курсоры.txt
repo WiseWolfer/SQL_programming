@@ -1,0 +1,35 @@
+create or replace procedure pr_info
+is
+emp_id employees.employee_id%TYPE;
+emp_name employees.first_name%TYPE;
+emp_last_name employees.last_name%TYPE;
+emp_time_already_worked number;
+sys_time number;
+CURSOR emp_info 
+IS
+--получаю данные из таблицы работников
+Select employee_id, first_name, last_name, to_char(hire_date, 'yyyy') hire_date from employees
+Order by employee_id;
+begin
+--системное время в годах обрезаем до года и записываем в sys_time
+SELECT to_char(sysdate,'yyyy') sys_date into sys_time FROM dual;
+-- проверка курсора на открытие
+IF NOT emp_info%ISOPEN THEN
+   OPEN emp_info;
+   -- когда курсор открыт то пробегаемся по циклу пока все номера сотрудников не закончатся и выписываем нужные данные через dbms.
+   for i in (select employee_id from employees) loop
+        fetch emp_info into emp_id, emp_name, emp_last_name, emp_time_already_worked;
+        -- находим время работы человека относительно системного времени и сравниваем его с 10
+        if sys_time - emp_time_already_worked < 10 then
+            DBMS_OUTPUT.PUT_LINE('Номер сотрудника: '||emp_id||' Имя и фамилия: '||emp_name||' '||emp_last_name||' Меньше 10 лет');
+        else
+             DBMS_OUTPUT.PUT_LINE('Номер сотрудника: '||emp_id||' Имя и фамилия: '||emp_name||' '||emp_last_name||' Больше или равно 10 лет');
+        end if;
+    end loop;
+END IF;
+close emp_info; 
+end;
+-- вызов процедуры
+begin
+    pr_info;
+end;

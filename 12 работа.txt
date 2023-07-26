@@ -1,0 +1,17 @@
+--1
+Insert into copy_emp
+(EMPLOYEE_ID, FIRST_NAME, LAST_NAME, EMAIL, PHONE_NUMBER, HIRE_DATE, JOB_ID, SALARY, COMMISSION_PCT, MANAGER_ID, DEPARTMENT_ID)
+Values(210, 'Konstantin', 'Postnov', 'postnovkv@mgsu.ru', '8945903205', '05/20/1988', 'SA-REP', 10000, NULL, Null, 50)
+--2
+select * from copy_emp
+--3
+Begin
+SAVEPOINT A;
+
+--4
+Delete from copy_emp;
+--6
+Rollback to A;
+End;
+--7
+COMMIT;

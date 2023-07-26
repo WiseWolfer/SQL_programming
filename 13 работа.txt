@@ -1,0 +1,43 @@
+--1
+Create Table Dept
+(department_id Number(3), department_name varchar(20));
+--2
+Insert into Dept
+(department_id, department_name)
+Select department_id,department_name 
+From departments
+--3
+Create Table EMP
+as Select *
+From Employees
+--4
+Alter Table EMP
+MODIFY(last_name varchar(30));
+--5
+Create Table Employees2
+as select EMPLOYEE_ID as ID, FIRST_NAME as FIRST_NAME, LAST_NAME as LAST_NAME, SALARY as SALARY,DEPARTMENT_ID as DEPT_ID
+From Employees;
+--6
+Drop Table EMP;
+--7
+Rename Employees2 to EMP;
+--8
+Alter Table EMP
+Drop column first_name
+--9
+ALTER TABLE EMP
+ADD CONSTRAINT my_emp_id_pk
+Primary KEY(id);
+--10
+ALTER TABLE DEPT
+ADD CONSTRAINT my_dept_id_pk
+Primary KEY(department_id);
+--11
+ALTER TABLE EMP
+ADD CONSTRAINT my_emp_dept_id_fk 
+FOREIGN KEY(Dept_id)
+REFERENCES DEPT(department_id);
+--12
+ALTER TABLE EMP
+Add(Commission NUMBER(2,2) constraint emp_moreZERO_fk check (commission>0));
+

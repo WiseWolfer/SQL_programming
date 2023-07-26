@@ -1,0 +1,45 @@
+--1
+SELECT max(SALARY) "Maximum", min(SALARY) "Minimum", Round(avg(SALARY)) "Average SALARY", sum(SALARY) as "Sum"
+FROM EMPLOYEES;
+
+--2
+SELECT job_id, max(SALARY) "Maximum", min(SALARY) "Minimum", Round(avg(SALARY)) "Average SALARY", sum(SALARY) as "Sum"
+FROM EMPLOYEES
+Group by job_id;
+
+--3
+SELECT job_id, Count(job_id) as "Amount_of_jobs"
+FROM EMPLOYEES
+Group by job_id;
+
+--4
+SELECT Count(Distinct manager_id) "Number of Managers"
+FROM EMPLOYEES;
+
+--5
+SELECT Max(SALARY) - Min(SALARY) as "Difference"
+FROM EMPLOYEES;
+
+--6
+SELECT Distinct manager_id, min(SALARY) as "Min SALARY"
+FROM EMPLOYEES
+Where manager_id is not null
+Group by manager_id
+Having min(SALARY) >= 6000
+ORDER BY "Min SALARY" desc;
+
+--7
+SELECT d.department_name as "Name", l.location_id as "Location",  Count(e.employee_id) as "Amount_of_employees", Round(avg(e.SALARY)) as "Salary"
+From EMPLOYEES e, departments d, locations l
+Where d.department_id = e.department_id
+And  d.location_id = l.location_id
+Group by d.department_name, l.location_id
+ORDER By "Salary";
+
+--8
+SELECT COUNT (employee_id) "Total Amount",
+SUM (DECODE (TO_CHAR (hire_date, 'YYYY'), 1995, 1)) "1995",
+SUM (DECODE (TO_CHAR (hire_date, 'YYYY'), 1996, 1)) "1996",
+SUM (DECODE (TO_CHAR (hire_date, 'YYYY'), 1997, 1)) "1997",
+SUM (DECODE (TO_CHAR (hire_date, 'YYYY'), 1998, 1)) "1998"
+From EMPLOYEES;

@@ -1,0 +1,59 @@
+--1_задание
+SELECT EMPLOYEES.LAST_nAME, DEPARTMENTS.DEPARTMENT_iD,DEPARTMENTS.DEPARTMENT_NAME
+FROM EMPLOYEES, DEPARTMENTS
+WHERE EMPLOYEES.DEPARTMENT_iD = DEPARTMENTS.DEPARTMENT_iD;
+--2_задание
+SELECT EMPLOYEES.job_id, departments.location_id, locations.city
+FROM EMPLOYEES, departments, locations
+WHERE EMPLOYEES.DEPARTMENT_iD = departments.department_id
+And locationS.location_id = departments.location_id
+And departments.DEPARTMENT_iD = 80;
+--3_задание
+SELECT EMPLOYEES.LAST_nAME, departments.DEPARTMENT_NAME, departments.location_id, locationS.city
+From EMPLOYEES, departments, locations
+WHERE EMPLOYEES.department_id = departments.department_id
+And departments.location_id = locationS.location_id
+And employees.COMMISSION_PCT is not null;
+--4_задание
+SELECT EMPLOYEES.LAST_nAME, departments.DEPARTMENT_NAME
+FROM EMPLOYEES, departments
+Where employees.DEPARTMENT_id = departments.DEPARTMENT_id
+and EMPLOYEES.LAST_nAME like '%a%';
+--5_задание
+--1 вариант_через_код_города
+SELECT EMPLOYEES.LAST_nAME, jobs.job_id,departments.department_id, departments.DEPARTMENT_NAME
+From EMPLOYEES, jobs, departments
+WHERE EMPLOYEES.department_id =departments.DEPARTMENT_iD
+and EMPLOYEES.job_id =jobs.job_id
+and departments.location_id = 1800;
+--2 вариант ищем через название
+SELECT EMPLOYEES.LAST_nAME, EMPLOYEES.job_id,departments.department_id, departments.DEPARTMENT_NAME
+From EMPLOYEES,departments,locations
+WHERE EMPLOYEES.department_id = departments.department_id
+and departments.location_id = locations.location_id
+and locations.city IN 'Toronto'; --тут либо  IN, либо like
+--6_задание
+SELECT E.LAST_nAME as "Employee", E.employee_id as "Emp#" , b.LAST_nAME as "Manager", b.employee_id as "Mgr#"
+From EMPLOYEES e, EMPLOYEES b
+Where e.manager_id = b.employee_id;
+--7_задание
+SELECT E.LAST_nAME as "Employee", E.employee_id as "Emp#" , b.LAST_nAME as "Manager", b.employee_id as "Mgr#"
+From EMPLOYEES e, EMPLOYEES b
+Where e.manager_id = b.employee_id(+);
+--8_задание
+SELECT e.department_id as "department", e.last_name as "employees", b.last_name as "co-workers"
+FROM EMPLOYEES b, EMPLOYEES e 
+WHERE e.department_id = b.department_id
+ORDER BY e.department_id, e.last_name, b.last_name;
+--9_задание
+Select e.LAST_nAME as "LAST NAME", TO_CHAR(e.Hire_date, 'DD-MM-YYYY') as "HIRE DATE"
+From EMPLOYEES e, EMPLOYEES b
+where b.LAST_nAME = 'Davies' 
+and b.Hire_date < e.Hire_date
+Order by e.Hire_date;
+--10_задание
+Select e.LAST_nAME, TO_CHAR(e.Hire_date,'DD-MM-YYYY') as "HIRE DATE", b.LAST_nAME, TO_CHAR(b.Hire_date,'DD-MM-YYYY') as "HIRE DATE"
+FROM EMPLOYEES e, EMPLOYEES b
+Where e.manager_id = b.employee_id
+And b.Hire_date > e.Hire_date;
+

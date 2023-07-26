@@ -1,0 +1,43 @@
+--1
+Select Distinct department_id
+FROM departments
+Minus
+Select Distinct department_id
+From employees
+where job_id = 'ST_CLERK'
+Order by department_id;
+--2
+Select country_id, country_name
+From countries  
+Minus
+Select c.COUNTRY_ID, c.country_name
+From LOCATIONS l, DEPARTMENTS d, countries c
+where d.LOCATION_ID = l.LOCATION_ID
+and l.country_id = c.country_id
+--3
+Select job_id,department_id
+From employees
+where department_id = 10
+Union 
+Select job_id,department_id
+From employees
+where department_id = 50
+Union
+Select job_id,department_id
+From employees
+where department_id = 20
+Order by job_id, department_id;
+--4
+Select employee_id, job_id
+From employees
+Intersect
+Select employee_id, job_id
+From job_history
+--5
+SELECT employee_id, department_id, TO_CHAR (NULL) department_name 
+FROM employees 
+UNION 
+SELECT TO_Number (NULL), department_id, department_name
+FROM departments;
+
+
